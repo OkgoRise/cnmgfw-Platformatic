@@ -1,40 +1,33 @@
-name: Redeploy Platformatic
+name: ci
+
 on:
-  workflow_dispatch:
-  schedule:
-    - cron: '0 */3 * * *'
+  push:
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
 
 jobs:
-  Redeploy:
-    name: Redeploy Platformatic
-
+  test:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        node-version: [20.x]
     steps:
-      - uses: actions/checkout@v4.0.0
-        with:
-          fetch-depth: 1
+      - uses: actions/checkout@v4
 
-      - name: Renew README.md
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install
         run: |
-            DATE=$(date "+%Y/%m/%d %H:%M:%S")
-            echo "${DATE}" > README.md
-            git checkout --orphan tmp_work
-            git branch -d main
-            echo "DATE=${DATE}" >> $GITHUB_ENV
-
-      - name: Upload to repository
-        uses: stefanzweifel/git-auto-commit-action@v4.16.0
-        with:
-          commit_message: Auto deploy by Github Actions, ${{ env.DATE }}
-          create_branch: true
-          branch: main
-          push_options: --force
-
-      - name: Delete old workflow runs
-        uses: MajorScruffy/delete-old-workflow-runs@v0.3.0
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          repository: ${{ github.repository }}
-          older-than-seconds: 3600
+          npm i
+      - name: Run tests
+        run: |
+          npm run test
