@@ -29,7 +29,7 @@ jobs:
         run: npm install platformatic
 
       - name: Deploy to Platformatic Cloud
-        run: npx platformatic deploy -t static -c platformatic.db.json -e .env -s .secrets.env --workspace-id=${{ secrets.PLATFORMATIC_WORKSPACE_ID }} --workspace-key=${{ secrets.PLATFORMATIC_WORKSPACE_KEY }}
+        run: npx platformatic deploy -t static -c platformatic.db.json -e .env -s .secrets.env --workspace-id=${{ secrets.PLATFORMATIC_DYNAMIC_WORKSPACE_ID }} --workspace-key=${{ secrets.PLATFORMATIC_DYNAMIC_WORKSPACE_API_KEY }}
         env:
-          PLATFORMATIC_WORKSPACE_ID: ${{ secrets.PLATFORMATIC_WORKSPACE_ID }}
-          PLATFORMATIC_WORKSPACE_KEY: ${{ secrets.PLATFORMATIC_WORKSPACE_KEY }}
+          PLATFORMATIC_WORKSPACE_ID: ${{ secrets.PLATFORMATIC_DYNAMIC_WORKSPACE_ID }}
+          PLATFORMATIC_WORKSPACE_KEY: ${{ secrets.PLATFORMATIC_DYNAMIC_WORKSPACE_API_KEY }}
