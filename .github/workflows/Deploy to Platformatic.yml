@@ -3,11 +3,11 @@ name: Deploy to Platformatic Cloud
 on:
   push:
     branches:
-      - main  # or your default branch
+      - main  # 或者您的默认分支
   pull_request:
 
 jobs:
-  build:
+  setup-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,19 +16,14 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x  # Ensure this matches your project's requirements
+          node-version: '20.x'  # 请确保这与您的项目要求匹配
 
       - name: Install dependencies
         run: npm install
 
-      - name: Build project
-        run: npm run build  # Only if you have a build step
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+      # 注释或移除了构建项目的步骤，因为您的项目不需要构建步骤
+      #- name: Build project
+      #  run: npm run build
 
       - name: Install Platformatic CLI
         run: npm install platformatic
