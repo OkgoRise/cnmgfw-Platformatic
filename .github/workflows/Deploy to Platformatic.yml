@@ -3,19 +3,38 @@ name: Deploy to Platformatic Cloud
 on:
   push:
     branches:
-      - main
+      - main  # or your default branch
+  pull_request:
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x  # Ensure this matches your project's requirements
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build  # Only if you have a build step
+
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 16
-    - run: npm ci
-    - name: Deploy to Platformatic Cloud Static Workspace
-      env:
-        PLATFORMATIC_STATIC_WORKSPACE_ID: ${{ secrets.PLATFORMATIC_STATIC_WORKSPACE_ID }}
-        PLATFORMATIC_STATIC_WORKSPACE_API_KEY: ${{ secrets.PLATFORMATIC_STATIC_WORKSPACE_API_KEY }}
-      run: npm run deploy:static
+      - uses: actions/checkout@v4
+
+      - name: Install Platformatic CLI
+        run: npm install platformatic
+
+      - name: Deploy to Platformatic Cloud
+        run: npx platformatic deploy -t static -c platformatic.db.json -e .env -s .secrets.env --workspace-id=${{ secrets.PLATFORMATIC_WORKSPACE_ID }} --workspace-key=${{ secrets.PLATFORMATIC_WORKSPACE_KEY }}
+        env:
+          PLATFORMATIC_WORKSPACE_ID: ${{ secrets.PLATFORMATIC_WORKSPACE_ID }}
+          PLATFORMATIC_WORKSPACE_KEY: ${{ secrets.PLATFORMATIC_WORKSPACE_KEY }}
