@@ -1,0 +1,11 @@
+{
+  "services": {
+    "web": {
+      "start": "node index.js", // 启动命令
+      "ports": [3000], // 端口号
+      "env": {
+        "NODE_ENV": "production" // 环境变量
+      }
+    }
+  }
+}
