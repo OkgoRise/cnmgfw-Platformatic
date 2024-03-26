@@ -1,24 +1,30 @@
-name: Deploy Platformatic app to Platformatic cloud
+name: Deploy to Platformatic Cloud
 
-on: push
+on:
+  push:
+    branches:
+      - main  # 或您想要自动部署的分支
+  pull_request:
+    branches:
+      - main  # 根据需要可调整
 
 jobs:
-  build_and_deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout application project repository
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Install app dependencies
-        run: npm install --omit=dev
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16' 
 
-      - name: Deploy app
-        uses: platformatic/onestep@latest
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          platformatic_workspace_id: ${{ secrets.PLATFORMATIC_DYNAMIC_WORKSPACE_ID }}
-          platformatic_workspace_key: ${{ secrets.PLATFORMATIC_DYNAMIC_WORKSPACE_API_KEY }}
-          platformatic_config_path: ./platformatic.db.json
+    - name: Install dependencies
+      run: npm install
 
-      - name: Output deployed app URL
-        run: echo 'Deployed App URL: ${{ steps.deploy-app.outputs.platformatic_app_url }}'
+    - name: Deploy to Platformatic Cloud
+      run: npx platformatic deploy
+      env:
+        PLATFORMATIC_WORKSPACE_ID: ${{ secrets.PLATFORMATIC_DYNAMIC_WORKSPACE_ID }}
+        PLATFORMATIC_WORKSPACE_API_KEY: ${{ secrets.PLATFORMATIC_DYNAMIC_WORKSPACE_API_KEY }}
