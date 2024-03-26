@@ -1,35 +1,42 @@
-name: Deploy to Platformatic Cloud
+name: Deploy Node.js App to Platformatic Cloud
 
 on:
   push:
     branches:
-      - main  # 或者您的默认分支
-  pull_request:
+      - main  # Assuming your main branch is named 'main'
+  workflow_dispatch:
+    inputs:
+      label:
+        description: "Preview Label"
+        required: false
+        default: ""
 
 jobs:
-  setup-and-deploy:
+  build_and_deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.x'  # 请确保这与您的项目要求匹配
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
       - name: Install dependencies
-        run: npm install
-
-      # 注释或移除了构建项目的步骤，因为您的项目不需要构建步骤
-      #- name: Build project
-      #  run: npm run build
-
-      - name: Install Platformatic CLI
-        run: npm install platformatic
+        run: npm install --omit=dev
 
       - name: Deploy to Platformatic Cloud
-        run: npx platformatic deploy -t static -c platformatic.db.json -e .env -s .secrets.env --workspace-id=${{ secrets.PLATFORMATIC_DYNAMIC_WORKSPACE_ID }} --workspace-key=${{ secrets.PLATFORMATIC_DYNAMIC_WORKSPACE_API_KEY }}
+        uses: platformatic/onestep@latest
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          platformatic_workspace_id: ${{ secrets.PLATFORMATIC_DYNAMIC_WORKSPACE_ID }}
+          platformatic_workspace_key: ${{ secrets.PLATFORMATIC_DYNAMIC_WORKSPACE_API_KEY }}
+          platformatic_config_path: ./platformatic.db.json
+          post_pr_comment: true
+          variables: custom_variable1, custom_variable2
+          secrets: custom_secret1
+          label: ${{ github.event.inputs.label }}
         env:
-          PLATFORMATIC_WORKSPACE_ID: ${{ secrets.PLATFORMATIC_DYNAMIC_WORKSPACE_ID }}
-          PLATFORMATIC_WORKSPACE_KEY: ${{ secrets.PLATFORMATIC_DYNAMIC_WORKSPACE_API_KEY }}
+          plt_custom_variable: test1
+          custom_variable1: test2
+          custom_variable2: test3
+          custom_secret1: test5
+
+      - name: Output deployed app URL
+        run: echo 'Deployed App URL: ${{ steps.deploy-app.outputs.platformatic_app_url }}'
