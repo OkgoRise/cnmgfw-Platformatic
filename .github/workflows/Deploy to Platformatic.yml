@@ -3,11 +3,10 @@ name: Deploy to Platformatic Cloud
 on:
   push:
     branches:
-      - main  # 或您想要自动部署的分支
+      - main  
   pull_request:
     branches:
-      - main  # 根据需要可调整
-
+      - main  
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -27,7 +26,7 @@ jobs:
       run: npm install
 
     - name: Deploy to Platformatic Cloud
-      run: npx platformatic deploy -t dynamic --workspace-id ${{ secrets.PLATFORMATIC_DYNAMIC_WORKSPACE_ID }} --workspace-key ${{ secrets.PLATFORMATIC_DYNAMIC_WORKSPACE_API_KEY }} --label my-deploy-label
+      run: npx platformatic deploy -t dynamic --workspace-id ${{ secrets.PLATFORMATIC_DYNAMIC_WORKSPACE_ID }} --workspace-key ${{ secrets.PLATFORMATIC_DYNAMIC_WORKSPACE_API_KEY }} --label hello
       env:
         PLATFORMATIC_WORKSPACE_ID: ${{ secrets.PLATFORMATIC_DYNAMIC_WORKSPACE_ID }}
         PLATFORMATIC_WORKSPACE_API_KEY: ${{ secrets.PLATFORMATIC_DYNAMIC_WORKSPACE_API_KEY }}
